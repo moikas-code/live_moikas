@@ -34,9 +34,9 @@ export default function StreamEmbed({
       create_embed();
     }
     function create_embed() {
-      // @ts-expect-error
+      // @ts-expect-error: Twitch.Embed is not typed in the global window object
       if (window.Twitch && window.Twitch.Embed) {
-        // @ts-expect-error
+        // @ts-expect-error: Twitch.Embed is not typed in the global window object
         const embed = new window.Twitch.Embed(embed_ref.current!.id, {
           width,
           height,
@@ -49,7 +49,7 @@ export default function StreamEmbed({
           embed.addEventListener('videoReady', () => {
             try {
               embed.getPlayer().pause();
-            } catch (e) {}
+            } catch {}
           });
         }
       }

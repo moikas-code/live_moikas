@@ -48,8 +48,12 @@ export default function HomePage() {
         if (!res.ok) throw new Error('Failed to fetch Twitch status');
         const data = await res.json();
         setCreators(data);
-      } catch (e: any) {
-        setError(e.message || 'Unknown error');
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          setError(e.message);
+        } else {
+          setError('Unknown error');
+        }
       } finally {
         setLoading(false);
       }

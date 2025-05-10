@@ -6,11 +6,10 @@ interface CreatorCardProps {
   live: boolean;
   stream: StreamData | null;
   user: UserData | null;
-  parent: string[];
   onViewStream?: () => void;
 }
 
-export default function CreatorCard({ login, live, stream, user, parent, onViewStream }: CreatorCardProps) {
+export default function CreatorCard({ login, live, stream, user, onViewStream }: CreatorCardProps) {
   // Helper to get the formatted thumbnail URL
   const get_thumbnail_url = (url: string) =>
     url.replace('{width}', '480').replace('{height}', '270');

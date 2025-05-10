@@ -35,6 +35,7 @@ export async function GET(_req: NextRequest) {
   const result = all_creators.map((login) => {
     const lower = login.toLowerCase();
     return {
+      _req,
       login,
       live: !!live_map[lower],
       stream: live_map[lower] || null,
