@@ -7,6 +7,7 @@ interface stream_embed_props {
   height?: number | string;
   layout?: 'video-with-chat' | 'video';
   parent: string[];
+  should_autoplay?: boolean;
 }
 
 export default function stream_embed({
@@ -16,6 +17,7 @@ export default function stream_embed({
   height = 480,
   layout = 'video',
   parent,
+  should_autoplay = true,
 }: stream_embed_props) {
   const embed_ref = useRef<HTMLDivElement>(null);
 
@@ -35,7 +37,7 @@ export default function stream_embed({
       // @ts-ignore
       if (window.Twitch && window.Twitch.Embed) {
         // @ts-ignore
-        new window.Twitch.Embed(embed_ref.current!.id, {
+        const embed = new window.Twitch.Embed(embed_ref.current!.id, {
           width,
           height,
           channel,
@@ -43,12 +45,19 @@ export default function stream_embed({
           muted: true,
           parent,
         });
+        if (!should_autoplay) {
+          embed.addEventListener('videoReady', () => {
+            try {
+              embed.getPlayer().pause();
+            } catch (e) {}
+          });
+        }
       }
     }
     return () => {
       if (embed_ref.current) embed_ref.current.innerHTML = '';
     };
-  }, [channel, live, width, height, layout, parent]);
+  }, [channel, live, width, height, layout, parent, should_autoplay]);
 
   if (!live) {
     return (

@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 import CreatorCard from '@/components/CreatorCard';
 import StreamEmbed from '@/components/StreamEmbed';
 
-const PARENT_DOMAINS = [typeof window !== 'undefined' ? window.location.hostname : 'localhost'];
-
 interface CreatorStatus {
   login: string;
   live: boolean;
@@ -17,6 +15,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [mainLogin, setMainLogin] = useState<string>('moikapy');
+  const [parent_domains, set_parent_domains] = useState<string[]>(['localhost']);
+
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('main_stream_login') : null;
+    if (saved) setMainLogin(saved);
+  }, []);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -36,8 +41,20 @@ export default function HomePage() {
     fetchStatus();
   }, []);
 
-  const main = creators.find((c) => c.login.toLowerCase() === 'moikapy');
-  const others = creators.filter((c) => c.login.toLowerCase() !== 'moikapy');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('main_stream_login', mainLogin);
+    }
+  }, [mainLogin]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      set_parent_domains([window.location.hostname]);
+    }
+  }, []);
+
+  const main = creators.find((c) => c.login.toLowerCase() === mainLogin.toLowerCase()) || creators.find((c) => c.login.toLowerCase() === 'moikapy');
+  const others = creators.filter((c) => c.login.toLowerCase() !== mainLogin.toLowerCase());
   const filtered = others.filter((c) =>
     c.login.toLowerCase().includes(search.toLowerCase()) ||
     c.user?.display_name?.toLowerCase().includes(search.toLowerCase())
@@ -59,7 +76,6 @@ export default function HomePage() {
         </div>
       </nav>
       <section className="mb-12">
-        <h1 className="text-4xl font-extrabold mb-4">Moikapy Main Stream</h1>
         {loading ? (
           <div className="skeleton h-96 w-full rounded-lg" aria-busy="true" />
         ) : error ? (
@@ -70,7 +86,8 @@ export default function HomePage() {
               <StreamEmbed
                 channel={main.login}
                 live={main.live}
-                parent={PARENT_DOMAINS}
+                parent={parent_domains}
+                should_autoplay={true}
               />
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
@@ -79,11 +96,21 @@ export default function HomePage() {
                   <img
                     src={main.user.profile_image_url}
                     alt={main.user.display_name || main.login}
-                    className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover"
+                    className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover hidden md:block"
                   />
                 )}
-                <div>
-                  <div className="text-2xl font-bold">{main.user?.display_name || main.login}</div>
+                <div className="flex flex-col gap-1 max-w-[600px]">
+                  <div className="text-sm md:text-2xl font-bold">{main.user?.display_name || main.login}</div>
+                  {main.live && main.stream?.title && (
+                    <div
+                      className="text-xs font-semibold mt-1 mb-1 text-ellipsis overflow-hidden"
+                      title={main.stream.title}
+                    >
+                      {main.stream.title.length > 100
+                        ? main.stream.title.slice(0, 100) + '...'
+                        : main.stream.title}
+                    </div>
+                  )}
                   {main.user?.description && (
                     <div className="text-xs text-base-content/60 mt-1">{main.user.description}</div>
                   )}
@@ -92,7 +119,6 @@ export default function HomePage() {
               <div className="flex flex-col items-start md:items-end gap-1">
                 {main.live && main.stream ? (
                   <>
-                    <span className="text-sm font-bold text-green-800 bg-green-100 rounded px-2 py-1 w-fit mb-1" style={{letterSpacing: '0.5px'}}>Live: {main.stream.title}</span>
                     {main.stream.game_name && (
                       <span className="text-xs text-purple-800 bg-purple-100 rounded px-2 py-1 w-fit mb-1" style={{letterSpacing: '0.5px'}}>{main.stream.game_name}</span>
                     )}
@@ -126,7 +152,12 @@ export default function HomePage() {
               <div className="col-span-full text-center text-base-content/60">No creators found.</div>
             ) : (
               filtered.map((c) => (
-                <CreatorCard key={c.login} {...c} parent={PARENT_DOMAINS} />
+                <CreatorCard
+                  key={c.login}
+                  {...c}
+                  parent={parent_domains}
+                  onViewStream={() => setMainLogin(c.login)}
+                />
               ))
             )}
           </div>

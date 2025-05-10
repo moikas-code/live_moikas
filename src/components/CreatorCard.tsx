@@ -1,5 +1,4 @@
 import StreamEmbed from './StreamEmbed';
-import Link from 'next/link';
 
 interface CreatorCardProps {
   login: string;
@@ -7,13 +6,21 @@ interface CreatorCardProps {
   stream: any;
   user: any;
   parent: string[];
+  onViewStream?: () => void;
 }
 
-export default function CreatorCard({ login, live, stream, user, parent }: CreatorCardProps) {
-  const channel_url = `https://twitch.tv/${login}`;
+export default function CreatorCard({ login, live, stream, user, parent, onViewStream }: CreatorCardProps) {
   return (
-    <Link href={channel_url} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${login}'s Twitch channel`} className="block h-full">
-      <div className="card bg-base-100 shadow-md h-full min-h-[22rem] flex flex-col transition-transform duration-200 hover:shadow-xl hover:scale-105 cursor-pointer">
+    <div
+      className="relative h-full"
+      role={onViewStream ? 'button' : undefined}
+      tabIndex={onViewStream ? 0 : undefined}
+      onClick={onViewStream ? (e) => { e.stopPropagation(); e.preventDefault(); onViewStream(); } : undefined}
+      onKeyDown={onViewStream ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewStream(); } } : undefined}
+      style={onViewStream ? { cursor: 'pointer' } : {}}
+      aria-label={onViewStream ? `Select ${user?.display_name || login} as main stream` : undefined}
+    >
+      <div className="card bg-base-100 shadow-md h-full min-h-[22rem] flex flex-col transition-transform duration-200 hover:shadow-xl hover:scale-105">
         <figure className="w-full flex flex-col items-center">
           {user?.profile_image_url && (
             <img
@@ -29,6 +36,7 @@ export default function CreatorCard({ login, live, stream, user, parent }: Creat
             width="100%"
             height={240}
             parent={parent}
+            should_autoplay={false}
           />
         </figure>
         <div className="card-body p-4 flex flex-col flex-1">
@@ -51,6 +59,6 @@ export default function CreatorCard({ login, live, stream, user, parent }: Creat
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

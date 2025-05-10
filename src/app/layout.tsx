@@ -1,14 +1,24 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="bg-base-200 min-h-screen">
-        <div className="fixed top-4 right-4 z-50">
-          <ThemeToggle />
-        </div>
         {children}
       </body>
     </html>
