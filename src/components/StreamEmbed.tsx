@@ -62,12 +62,14 @@ export default function stream_embed({
   }
 
   return (
-    <div
-      id={`twitch-embed-${channel}`}
-      ref={embed_ref}
-      style={{ width, height }}
-      aria-label={`Twitch stream for ${channel}`}
-      className="rounded-lg overflow-hidden"
-    />
+    <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-black">
+      <div
+        id={`twitch-embed-${channel}`}
+        ref={embed_ref}
+        style={{ width: '100%', height: '100%' }}
+        aria-label={`Twitch stream for ${channel}`}
+        className="w-full h-full"
+      />
+    </div>
   );
 } 

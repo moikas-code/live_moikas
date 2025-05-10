@@ -16,13 +16,13 @@
 - [ ] Make the theme toggle more accessible on mobile
 
 ## Creator Cards
-- [ ] Add avatars (Twitch profile images) for each creator
-- [ ] Show more info (game/category, short bio/description if available)
-- [ ] Add hover effects (shadow or scale) for interactivity
-- [ ] Make the whole card clickable, not just the "Visit Channel" button
+- [x] Add avatars (Twitch profile images) for each creator
+- [x] Show more info (game/category, short bio/description if available)
+- [x] Add hover effects (shadow or scale) for interactivity
+- [x] Make the whole card clickable, not just the "Visit Channel" button
 
 ## Stream Embed
-- [ ] Maintain aspect ratio (e.g., 16:9) for the video embed
+- [x] Maintain aspect ratio (e.g., 16:9) for the video embed
 - [ ] Add a loading spinner while the embed loads
 - [ ] Show stream title and category more prominently, possibly as an overlay
 
@@ -45,5 +45,5 @@
 
 ## Polish & Branding
 - [ ] Add a favicon and logo for branding
-- [ ] Use a custom color palette that matches branding
+- [ ] Use a custom color palette that matches branding (purple,black,gold,green)
 - [ ] Add subtle animations for card hover, button clicks, and theme changes 

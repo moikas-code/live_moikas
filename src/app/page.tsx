@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import CreatorCard from '@/components/CreatorCard';
+import StreamEmbed from '@/components/StreamEmbed';
 
 const PARENT_DOMAINS = [typeof window !== 'undefined' ? window.location.hostname : 'localhost'];
 
@@ -60,11 +61,49 @@ export default function HomePage() {
       <section className="mb-12">
         <h1 className="text-4xl font-extrabold mb-4">Moikapy Main Stream</h1>
         {loading ? (
-          <div className="skeleton h-64 w-full rounded-lg" aria-busy="true" />
+          <div className="skeleton h-96 w-full rounded-lg" aria-busy="true" />
         ) : error ? (
           <div className="alert alert-error">{error}</div>
         ) : main ? (
-          <CreatorCard {...main} parent={PARENT_DOMAINS} />
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-black mb-4">
+              <StreamEmbed
+                channel={main.login}
+                live={main.live}
+                parent={PARENT_DOMAINS}
+              />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+              <div className="flex items-center gap-4">
+                {main.user?.profile_image_url && (
+                  <img
+                    src={main.user.profile_image_url}
+                    alt={main.user.display_name || main.login}
+                    className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover"
+                  />
+                )}
+                <div>
+                  <div className="text-2xl font-bold">{main.user?.display_name || main.login}</div>
+                  {main.user?.description && (
+                    <div className="text-xs text-base-content/60 mt-1">{main.user.description}</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col items-start md:items-end gap-1">
+                {main.live && main.stream ? (
+                  <>
+                    <span className="text-sm font-bold text-green-800 bg-green-100 rounded px-2 py-1 w-fit mb-1" style={{letterSpacing: '0.5px'}}>Live: {main.stream.title}</span>
+                    {main.stream.game_name && (
+                      <span className="text-xs text-purple-800 bg-purple-100 rounded px-2 py-1 w-fit mb-1" style={{letterSpacing: '0.5px'}}>{main.stream.game_name}</span>
+                    )}
+                    <span className="text-xs">Viewers: {main.stream.viewer_count}</span>
+                  </>
+                ) : (
+                  <span className="text-sm font-bold text-red-800 bg-red-100 rounded px-2 py-1 w-fit" style={{letterSpacing: '0.5px'}}>Offline</span>
+                )}
+              </div>
+            </div>
+          </div>
         ) : null}
       </section>
       <div className="my-8 flex items-center" aria-hidden="true">
