@@ -1,5 +1,14 @@
 [
-  "ClaudePlaysPokemon",
-  "Gemini_Plays_Pokemon",
-  "rauqx"
+  {
+    "user_name": "ClaudePlaysPokemon",
+    "affiliate":false
+  },
+  {
+    "user_name": "Gemini_Plays_Pokemon",
+    "affiliate":false
+  },
+  {
+    "user_name": "rauqx",
+    "affiliate":true
+  }
 ] 

@@ -14,7 +14,7 @@ export default function StreamEmbed({
   channel,
   live,
   width = '100%',
-  height = 480,
+  height = '100%',
   layout = 'video',
   parent,
   should_autoplay = true,

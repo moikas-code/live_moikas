@@ -24,6 +24,7 @@ interface CreatorStatus {
   live: boolean;
   stream: StreamData | null;
   user: UserData | null;
+  affiliate: boolean;
 }
 
 export default function HomePage() {
@@ -31,13 +32,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [mainLogin, setMainLogin] = useState<string>('moikapy');
   const [parent_domains, set_parent_domains] = useState<string[]>(['localhost']);
-
-  useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('main_stream_login') : null;
-    if (saved) setMainLogin(saved);
-  }, []);
+  const filtered_offline = creators.filter((c) => !c.live);
+  const [show_offline, set_show_offline] = useState(false);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -63,19 +60,26 @@ export default function HomePage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('main_stream_login', mainLogin);
-    }
-  }, [mainLogin]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
       set_parent_domains([window.location.hostname]);
     }
   }, []);
 
-  const main = creators.find((c) => c.login.toLowerCase() === mainLogin.toLowerCase()) || creators.find((c) => c.login.toLowerCase() === 'moikapy');
+  // Determine main stream logic
+  const online_creators = creators.filter((c) => c.live);
+  let main: CreatorStatus | undefined;
+  if (online_creators.some((c) => c.login.toLowerCase() === 'moikapy')) {
+    main = creators.find((c) => c.login.toLowerCase() === 'moikapy');
+  } else if (online_creators.length > 0) {
+    main = online_creators.reduce((min, c) =>
+      (c.stream?.viewer_count ?? 0) < (min.stream?.viewer_count ?? 0) ? c : min,
+      online_creators[0]
+    );
+  } else {
+    main = creators.find((c) => c.login.toLowerCase() === 'moikapy');
+  }
+  const mainLogin = main?.login || 'moikapy';
   const others = creators.filter((c) => c.login.toLowerCase() !== mainLogin.toLowerCase());
-  const filtered = others.filter((c) =>
+  const filtered = others.filter((c) => c.live).filter((c) =>
     c.login.toLowerCase().includes(search.toLowerCase()) ||
     c.user?.display_name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -83,7 +87,7 @@ export default function HomePage() {
   return (
     <main className="container mx-auto px-2 py-8 max-w-6xl">
       <nav className="navbar bg-base-100 rounded-lg mb-8 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
-        <div className="text-3xl font-extrabold">Live Moikas</div>
+        <div className="text-3xl font-extrabold">live.moikas</div>
         <div className="flex gap-2 items-center w-full md:w-auto">
           <input
             type="text"
@@ -173,17 +177,44 @@ export default function HomePage() {
             {filtered.length === 0 ? (
               <div className="col-span-full text-center text-base-content/60">No creators found.</div>
             ) : (
-              filtered.map((c) => (
+              filtered.sort((a, b) => (a.stream?.viewer_count ?? 0) - (b.stream?.viewer_count ?? 0)).map((c) => (
                 <CreatorCard
                   key={c.login}
                   {...c}
-                  onViewStream={() => setMainLogin(c.login)}
+                  affiliate={c.affiliate}
+                  onViewStream={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('main_stream_login', c.login);
+                    }
+                    window.location.reload();
+                  }}
                 />
               ))
             )}
           </div>
         )}
       </section>
+      {/* Offline section */}
+      {filtered_offline.length > 0 && (
+        <section className="bg-base-200 rounded-lg p-6 mt-4">
+          <button
+            className="btn btn-sm btn-ghost mb-4"
+            onClick={() => set_show_offline((v) => !v)}
+            aria-expanded={show_offline}
+            aria-controls="offline-creators-section"
+          >
+            {show_offline ? 'Hide Offline Creators' : `Show Offline Creators (${filtered_offline.length})`}
+          </button>
+          <div
+            id="offline-creators-section"
+            className={show_offline ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8' : 'hidden'}
+          >
+            {filtered_offline.map((c) => (
+              <CreatorCard key={c.login} {...c} affiliate={c.affiliate} />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
