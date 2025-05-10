@@ -1,14 +1,26 @@
 [
   {
     "user_name": "ClaudePlaysPokemon",
-    "affiliate":false
+    "affiliate": false
   },
   {
     "user_name": "Gemini_Plays_Pokemon",
-    "affiliate":false
+    "affiliate": false
   },
   {
     "user_name": "rauqx",
-    "affiliate":true
+    "affiliate": true
+  },
+  {
+    "user_name": "wolfboygamingden",
+    "affiliate": true
+  },
+  {
+    "user_name": "sb_renegade",
+    "affiliate": true
+  },
+  {
+    "user_name": "hoshjarrod",
+    "affiliate": true
   }
-] 
+]
