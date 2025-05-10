@@ -209,7 +209,7 @@ export default function HomePage() {
                       </a>
                       {main.affiliate && main.affiliate_code && main.affiliate_code !== 'none' && (
                         <a
-                          href={`https://moikas.com/${(main?.display_name || main.login) === 'MOIKAPY' ? '/discount/' : ''}${main.affiliate_code}`}
+                          href={`https://moikas.com/${(main.user?.display_name || main.login) === 'MOIKAPY' ? 'discount/' : ''}${main.affiliate_code}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-info btn-xs font-semibold mt-2"
