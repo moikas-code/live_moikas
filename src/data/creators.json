@@ -1,42 +1,52 @@
 [
   {
     "user_name": "ClaudePlaysPokemon",
-    "affiliate": false
+    "affiliate": false,
+    "affiliate_code": "none"
   },
   {
     "user_name": "Gemini_Plays_Pokemon",
-    "affiliate": false
+    "affiliate": false,
+    "affiliate_code": "none"
   },
   {
     "user_name": "rauqx",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "rauqx"
   },
   {
     "user_name": "wolfboygamingden",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "wolfboygamingden"
   },
   {
     "user_name": "sb_renegade",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "sbrenegade"
   },
   {
     "user_name": "hoshjarrod",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "hoshjarrod"
   },
   {
     "user_name": "satedtv",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "satedtv"
   },
   {
     "user_name": "smurschmurr",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "smurschmurr"
   },
   {
     "user_name": "the9shadowbreakers",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "the9shadowbreakers"
   },
   {
     "user_name": "keykgeon",
-    "affiliate": true
+    "affiliate": true,
+    "affiliate_code": "keykstreamz"
   }
 ]

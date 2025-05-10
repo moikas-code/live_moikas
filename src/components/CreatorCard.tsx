@@ -7,10 +7,19 @@ interface CreatorCardProps {
   stream: StreamData | null;
   user: UserData | null;
   affiliate?: boolean;
+  affiliate_code?: string;
   onViewStream?: () => void;
 }
 
-export default function CreatorCard({ login, live, stream, user, affiliate, onViewStream }: CreatorCardProps) {
+export default function CreatorCard({
+  login,
+  live,
+  stream,
+  user,
+  affiliate,
+  affiliate_code,
+  onViewStream,
+}: CreatorCardProps) {
   // Helper to get the formatted thumbnail URL
   const get_thumbnail_url = (url: string) =>
     url.replace('{width}', '480').replace('{height}', '270');
@@ -89,7 +98,9 @@ export default function CreatorCard({ login, live, stream, user, affiliate, onVi
             <h2 className="text-sm m-0 flex items-center gap-2">
               {user?.display_name || login}
               {affiliate && (
-                <span className="ml-1 px-2 py-0.5 rounded bg-yellow-200 text-yellow-900 text-xs font-semibold border border-yellow-400">Affiliate</span>
+                <span className="ml-1 px-2 py-0.5 rounded bg-yellow-200 text-yellow-900 text-xs font-semibold border border-yellow-400">
+                  Affiliate
+                </span>
               )}
             </h2>
           </div>
@@ -119,6 +130,17 @@ export default function CreatorCard({ login, live, stream, user, affiliate, onVi
               >
                 Offline
               </p>
+            )}
+            {affiliate && affiliate_code && affiliate_code !== 'none' && (
+              <a
+                href={`https://moikas.com/${(user?.display_name || login) == 'MOIKAPY' ? 'discount/' : ''}${affiliate_code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-info btn-xs font-semibold mt-2"
+                aria-label={`Get merch discount for ${user?.display_name || login}`}
+              >
+                Get Merch Discount ({affiliate_code.toUpperCase()})
+              </a>
             )}
           </div>
         </div>

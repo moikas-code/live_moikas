@@ -13,6 +13,7 @@ interface CreatorStatus {
   stream: TwitchStream | null;
   user: TwitchUser | null;
   affiliate?: boolean;
+  affiliate_code: string;
 }
 
 export async function GET() {
@@ -20,11 +21,11 @@ export async function GET() {
     return NextResponse.json(cache.data);
   }
 
-  // Extract user_name and affiliate from creators.json
-  const creator_objs: { user_name: string; affiliate: boolean }[] = creators;
-  const all_creators: { login: string; affiliate: boolean }[] = [
-    { login: 'moikapy', affiliate: true },
-    ...creator_objs.map((c) => ({ login: c.user_name, affiliate: c.affiliate })),
+  // Extract user_name, affiliate, and affiliate_code from creators.json
+  const creator_objs: { user_name: string; affiliate: boolean; affiliate_code: string }[] = creators;
+  const all_creators: { login: string; affiliate: boolean; affiliate_code: string }[] = [
+    { login: 'moikapy', affiliate: true, affiliate_code: 'moikapy' },
+    ...creator_objs.map((c) => ({ login: c.user_name, affiliate: c.affiliate, affiliate_code: c.affiliate_code })),
   ];
   const all_logins = all_creators.map((c) => c.login);
 
@@ -40,7 +41,7 @@ export async function GET() {
   for (const user of users) {
     user_map[user.login.toLowerCase()] = user;
   }
-  const result = all_creators.map(({ login, affiliate }) => {
+  const result = all_creators.map(({ login, affiliate, affiliate_code }) => {
     const lower = login.toLowerCase();
     return {
       login,
@@ -48,6 +49,7 @@ export async function GET() {
       stream: live_map[lower] || null,
       user: user_map[lower] || null,
       affiliate,
+      affiliate_code,
     };
   });
   cache = { data: result, expires: Date.now() + CACHE_TTL * 1000 };
