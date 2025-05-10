@@ -2,12 +2,28 @@
 import { useEffect, useState } from 'react';
 import CreatorCard from '@/components/CreatorCard';
 import StreamEmbed from '@/components/StreamEmbed';
+import Image from 'next/image';
+
+export interface StreamData {
+  title: string;
+  game_name?: string;
+  viewer_count: number;
+  thumbnail_url?: string;
+  // add other fields as needed
+}
+
+export interface UserData {
+  display_name: string;
+  profile_image_url: string;
+  description?: string;
+  // add other fields as needed
+}
 
 interface CreatorStatus {
   login: string;
   live: boolean;
-  stream: any;
-  user: any;
+  stream: StreamData | null;
+  user: UserData | null;
 }
 
 export default function HomePage() {
@@ -93,9 +109,11 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
               <div className="flex items-center gap-4">
                 {main.user?.profile_image_url && (
-                  <img
+                  <Image
                     src={main.user.profile_image_url}
                     alt={main.user.display_name || main.login}
+                    width={64}
+                    height={64}
                     className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover hidden md:block"
                   />
                 )}

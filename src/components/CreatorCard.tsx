@@ -1,15 +1,20 @@
-import StreamEmbed from './StreamEmbed';
+import Image from 'next/image';
+import type { StreamData, UserData } from '@/app/page';
 
 interface CreatorCardProps {
   login: string;
   live: boolean;
-  stream: any;
-  user: any;
+  stream: StreamData | null;
+  user: UserData | null;
   parent: string[];
   onViewStream?: () => void;
 }
 
 export default function CreatorCard({ login, live, stream, user, parent, onViewStream }: CreatorCardProps) {
+  // Helper to get the formatted thumbnail URL
+  const get_thumbnail_url = (url: string) =>
+    url.replace('{width}', '480').replace('{height}', '270');
+
   return (
     <div
       className="relative h-full"
@@ -23,21 +28,30 @@ export default function CreatorCard({ login, live, stream, user, parent, onViewS
       <div className="card bg-base-100 shadow-md h-full min-h-[22rem] flex flex-col transition-transform duration-200 hover:shadow-xl hover:scale-105">
         <figure className="w-full flex flex-col items-center">
           {user?.profile_image_url && (
-            <img
+            <Image
               src={user.profile_image_url}
               alt={user.display_name || login}
+              width={80}
+              height={80}
               className="w-20 h-20 rounded-full border-2 border-base-300 shadow mb-2 object-cover"
               loading="lazy"
             />
           )}
-          <StreamEmbed
-            channel={login}
-            live={live}
-            width="100%"
-            height={240}
-            parent={parent}
-            should_autoplay={false}
-          />
+          {live && stream && stream.thumbnail_url ? (
+            <Image
+              src={get_thumbnail_url(stream.thumbnail_url)}
+              alt={`Stream thumbnail for ${user?.display_name || login}`}
+              width={480}
+              height={270}
+              className="rounded-lg w-full h-auto object-cover mb-2"
+              style={{ aspectRatio: '16/9', maxWidth: '100%' }}
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex items-center justify-center bg-base-200 rounded-lg w-full mb-2" style={{ height: 180, minHeight: 120 }}>
+              <span className="text-base-content/60 text-sm">{login} is currently offline</span>
+            </div>
+          )}
         </figure>
         <div className="card-body p-4 flex flex-col flex-1">
           <h2 className="card-title text-lg">{user?.display_name || login}</h2>

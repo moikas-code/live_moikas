@@ -1,26 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { get_live_streams, get_twitch_users } from '@/lib/twitch_api';
 import creators from '@/data/creators.json';
+import type { TwitchUser, TwitchStream } from '@/lib/twitch_api';
 
 // Simple in-memory cache
-let cache: { data: any; expires: number } | null = null;
+let cache: { data: CreatorStatus[]; expires: number } | null = null;
 const CACHE_TTL = 60; // seconds
 
-export async function GET(req: NextRequest) {
+interface CreatorStatus {
+  login: string;
+  live: boolean;
+  stream: TwitchStream | null;
+  user: TwitchUser | null;
+}
+
+export async function GET(_req: NextRequest) {
   if (cache && Date.now() < cache.expires) {
     return NextResponse.json(cache.data);
   }
 
-  const all_creators = ['moikapy', ...creators];
+  const all_creators: string[] = ['moikapy', ...creators];
   // Twitch API allows up to 100 logins per request
-  const live_streams = await get_live_streams(all_creators);
-  const live_map: Record<string, any> = {};
+  const live_streams: TwitchStream[] = await get_live_streams(all_creators);
+  const live_map: Record<string, TwitchStream> = {};
   for (const stream of live_streams) {
     live_map[stream.user_login.toLowerCase()] = stream;
   }
   // Get user info for all creators
-  const users = await get_twitch_users(all_creators);
-  const user_map: Record<string, any> = {};
+  const users: TwitchUser[] = await get_twitch_users(all_creators);
+  const user_map: Record<string, TwitchUser> = {};
   for (const user of users) {
     user_map[user.login.toLowerCase()] = user;
   }

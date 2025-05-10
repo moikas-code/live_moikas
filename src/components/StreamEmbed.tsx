@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-interface stream_embed_props {
+interface StreamEmbedProps {
   channel: string;
   live: boolean;
   width?: number | string;
@@ -10,7 +10,7 @@ interface stream_embed_props {
   should_autoplay?: boolean;
 }
 
-export default function stream_embed({
+export default function StreamEmbed({
   channel,
   live,
   width = '100%',
@@ -18,7 +18,7 @@ export default function stream_embed({
   layout = 'video',
   parent,
   should_autoplay = true,
-}: stream_embed_props) {
+}: StreamEmbedProps) {
   const embed_ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,9 +34,9 @@ export default function stream_embed({
       create_embed();
     }
     function create_embed() {
-      // @ts-ignore
+      // @ts-expect-error
       if (window.Twitch && window.Twitch.Embed) {
-        // @ts-ignore
+        // @ts-expect-error
         const embed = new window.Twitch.Embed(embed_ref.current!.id, {
           width,
           height,
@@ -54,8 +54,9 @@ export default function stream_embed({
         }
       }
     }
+    const ref = embed_ref.current;
     return () => {
-      if (embed_ref.current) embed_ref.current.innerHTML = '';
+      if (ref) ref.innerHTML = '';
     };
   }, [channel, live, width, height, layout, parent, should_autoplay]);
 
