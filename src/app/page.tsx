@@ -177,7 +177,6 @@ export default function HomePage() {
                 <CreatorCard
                   key={c.login}
                   {...c}
-                  parent={parent_domains}
                   onViewStream={() => setMainLogin(c.login)}
                 />
               ))
