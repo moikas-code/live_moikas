@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "default", "format": ["snake_case"] },
+      { "selector": "variableLike", "format": ["snake_case"] },
+      { "selector": "typeLike", "format": ["PascalCase"] }
+    ]
+  }
+} 
