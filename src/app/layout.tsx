@@ -1,15 +1,9 @@
-"use client";
 import './globals.css';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { Analytics } from "@vercel/analytics/next";
-
-function ThemeHydrationFix({ children }: { children: ReactNode }) {
-  useEffect(() => {
-    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-  }, []);
-  return <>{children}</>;
-}
+import { default_metadata } from '@/lib/seo_metadata';
+import { ThemeHydrationFix } from '@/components/ThemeHydrationFix';
+import type { Metadata } from 'next';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,3 +15,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
+export const metadata: Metadata = default_metadata;
