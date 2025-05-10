@@ -1,6 +1,7 @@
 "use client";
 import './globals.css';
 import { ReactNode, useEffect } from 'react';
+import { Analytics } from "@vercel/analytics/next";
 
 function ThemeHydrationFix({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className="bg-base-200 min-h-screen">
         <ThemeHydrationFix>{children}</ThemeHydrationFix>
+        <Analytics />
       </body>
     </html>
   );
