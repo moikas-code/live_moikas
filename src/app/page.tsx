@@ -43,9 +43,9 @@ export default function HomePage() {
   );
 
   return (
-    <main className="container mx-auto px-2 py-4 max-w-6xl">
-      <nav className="navbar bg-base-100 rounded-lg mb-4 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
-        <div className="text-2xl font-bold">Live Moikas</div>
+    <main className="container mx-auto px-2 py-8 max-w-6xl">
+      <nav className="navbar bg-base-100 rounded-lg mb-8 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
+        <div className="text-3xl font-extrabold">Live Moikas</div>
         <div className="flex gap-2 items-center w-full md:w-auto">
           <input
             type="text"
@@ -57,8 +57,8 @@ export default function HomePage() {
           />
         </div>
       </nav>
-      <section className="mb-8">
-        <h1 className="text-xl font-semibold mb-2">Moikapy Main Stream</h1>
+      <section className="mb-12">
+        <h1 className="text-4xl font-extrabold mb-4">Moikapy Main Stream</h1>
         {loading ? (
           <div className="skeleton h-64 w-full rounded-lg" aria-busy="true" />
         ) : error ? (
@@ -67,10 +67,14 @@ export default function HomePage() {
           <CreatorCard {...main} parent={PARENT_DOMAINS} />
         ) : null}
       </section>
-      <section>
-        <h2 className="text-lg font-semibold mb-2">Other Creators</h2>
+      <div className="my-8 flex items-center" aria-hidden="true">
+        <hr className="flex-grow border-t-2 border-base-300" />
+        <span className="mx-4 text-lg font-bold text-base-content/60">Other Creators</span>
+        <hr className="flex-grow border-t-2 border-base-300" />
+      </div>
+      <section className="bg-base-200 rounded-lg p-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="skeleton h-80 w-full rounded-lg" aria-busy="true" />
             ))}
@@ -78,7 +82,7 @@ export default function HomePage() {
         ) : error ? (
           <div className="alert alert-error">{error}</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {filtered.length === 0 ? (
               <div className="col-span-full text-center text-base-content/60">No creators found.</div>
             ) : (
