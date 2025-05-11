@@ -41,6 +41,7 @@ export default function HomePage() {
   const [tv_mode_open, set_tv_mode_open] = useState(false);
   const [chat_open, set_chat_open] = useState(false);
   const [tv_mode_login, set_tv_mode_login] = useState<string | null>(null);
+  const [selected_main_login, set_selected_main_login] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -72,19 +73,15 @@ export default function HomePage() {
 
   // Determine main stream logic
   const online_creators = creators.filter((c) => c.live);
-  let main: CreatorStatus | undefined;
-  if (online_creators.some((c) => c.login.toLowerCase() === 'moikapy')) {
-    main = creators.find((c) => c.login.toLowerCase() === 'moikapy');
-  } else if (online_creators.length > 0) {
-    main = online_creators.reduce(
-      (min, c) => ((c.stream?.viewer_count ?? 0) < (min.stream?.viewer_count ?? 0) ? c : min),
-      online_creators[0],
-    );
-  } else {
-    main = creators.find((c) => c.login.toLowerCase() === 'moikapy');
-  }
-  const mainLogin = main?.login || 'moikapy';
-  const others = creators.filter((c) => c.login.toLowerCase() !== mainLogin.toLowerCase());
+  const main_login = selected_main_login
+    || (online_creators.some((c) => c.login.toLowerCase() === 'moikapy')
+      ? creators.find((c) => c.login.toLowerCase() === 'moikapy')?.login
+      : online_creators.length > 0
+        ? online_creators.reduce((min, c) => ((c.stream?.viewer_count ?? 0) < (min.stream?.viewer_count ?? 0) ? c : min), online_creators[0]).login
+        : creators.find((c) => c.login.toLowerCase() === 'moikapy')?.login
+    ) || 'moikapy';
+  const main: CreatorStatus | undefined = creators.find((c) => c.login === main_login);
+  const others = creators.filter((c) => c.login.toLowerCase() !== main_login.toLowerCase());
   const filtered = others
     .filter((c) => c.live)
     .filter(
@@ -97,16 +94,14 @@ export default function HomePage() {
   useEffect(() => {
     if (tv_mode_open && online_creators.length > 0) {
       set_tv_mode_login((prev) => {
-        // If already set and still online, keep it
         if (prev && online_creators.some((c) => c.login === prev)) return prev;
-        // Otherwise, use the main stream login
-        return mainLogin;
+        return main_login || null;
       });
     }
     if (!tv_mode_open) {
       set_tv_mode_login(null);
     }
-  }, [tv_mode_open, mainLogin, online_creators]);
+  }, [tv_mode_open, main_login, online_creators]);
 
   // Get the current TV Mode stream
   const tv_mode_index = online_creators.findIndex((c) => c.login === tv_mode_login);
@@ -390,7 +385,7 @@ export default function HomePage() {
                         if (typeof window !== 'undefined') {
                           localStorage.setItem('main_stream_login', c.login);
                         }
-                        window.location.reload();
+                        set_selected_main_login(c.login);
                       }}
                     />
                   ))
