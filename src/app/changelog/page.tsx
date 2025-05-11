@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Commit {
   sha: string;
@@ -98,9 +99,11 @@ export default function ChangelogPage() {
                   </div>
                   {commit.author && (
                     <div className="flex items-center mt-1">
-                      <img
+                      <Image
                         src={commit.author.avatar_url}
                         alt={commit.author.login}
+                        width={24}
+                        height={24}
                         className="w-6 h-6 rounded-full mr-2"
                       />
                       <span className="text-xs">{commit.author.login}</span>
