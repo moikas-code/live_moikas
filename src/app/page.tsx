@@ -79,9 +79,10 @@ export default function HomePage() {
       : online_creators.length > 0
         ? online_creators.reduce((min, c) => ((c.stream?.viewer_count ?? 0) < (min.stream?.viewer_count ?? 0) ? c : min), online_creators[0]).login
         : creators.find((c) => c.login.toLowerCase() === 'moikapy')?.login
-    ) || 'moikapy';
-  const main: CreatorStatus | undefined = creators.find((c) => c.login === main_login);
-  const others = creators.filter((c) => c.login.toLowerCase() !== main_login.toLowerCase());
+    );
+  const main_login_safe = main_login || 'moikapy';
+  const main: CreatorStatus | undefined = creators.find((c) => c.login === main_login_safe);
+  const others = creators.filter((c) => c.login.toLowerCase() !== main_login_safe.toLowerCase());
   const filtered = others
     .filter((c) => c.live)
     .filter(
