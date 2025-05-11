@@ -180,9 +180,9 @@ export default function HomePage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-info btn-xs font-semibold mb-2"
-                        aria-label={`Support ${tv_mode_stream.user?.display_name || tv_mode_stream.login} with discount code`}
+                        aria-label={`Get discount for ${tv_mode_stream.user?.display_name || tv_mode_stream.login}`}
                       >
-                        Support Me ({tv_mode_stream.affiliate_code.toUpperCase()})
+                        Get Discount ({tv_mode_stream.affiliate_code.toUpperCase()})
                       </a>
                     )}
                   </div>
@@ -291,7 +291,7 @@ export default function HomePage() {
                           className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover hidden md:block"
                         />
                       )}
-                      <div className="flex flex-col gap-1 max-w-[600px]">
+                      <div className="flex flex-col gap-1 max-w-[500px]">
                         <div className="text-sm md:text-2xl font-bold">
                           {main.user?.display_name || main.login}
                         </div>
@@ -339,9 +339,9 @@ export default function HomePage() {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn btn-info btn-xs font-semibold mt-2"
-                              aria-label={`Get merch discount for ${main.user?.display_name || main.login}`}
+                              aria-label={`Get discount for ${main.user?.display_name || main.login}`}
                             >
-                              Get Merch Discount ({main.affiliate_code.toUpperCase()})
+                              Get Discount ({main.affiliate_code.toUpperCase()})
                             </a>
                           )}
                           {/* TV Mode button */}
