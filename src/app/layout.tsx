@@ -8,6 +8,11 @@ import type { Metadata } from 'next';
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#18181b" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+      </head>
       <body className="bg-base-200 min-h-screen">
         <ThemeHydrationFix>{children}</ThemeHydrationFix>
         <Analytics />
