@@ -73,6 +73,16 @@ export default function CreatorCard({
                 style={{ aspectRatio: '16/9', maxWidth: '100%' }}
                 loading="lazy"
               />
+            ) : user?.offline_image_url ? (
+              <Image
+                src={user.offline_image_url}
+                alt={`Offline image for ${user.display_name || login}`}
+                width={480}
+                height={270}
+                className="rounded-lg w-full h-auto object-cover mb-2"
+                style={{ aspectRatio: '16/9', maxWidth: '100%' }}
+                loading="lazy"
+              />
             ) : (
               <div
                 className="flex items-center justify-center bg-base-200 rounded-lg w-full mb-2"

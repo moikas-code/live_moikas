@@ -15,6 +15,7 @@ export interface StreamData {
 export interface UserData {
   display_name: string;
   profile_image_url: string;
+  offline_image_url?: string;
   description?: string;
   // add other fields as needed
 }

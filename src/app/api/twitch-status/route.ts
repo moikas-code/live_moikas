@@ -18,7 +18,9 @@ interface CreatorStatus {
 
 export async function GET() {
   if (cache && Date.now() < cache.expires) {
-    return NextResponse.json(cache.data);
+    const response = NextResponse.json(cache.data);
+    response.headers.set('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+    return response;
   }
 
   // Extract user_name, affiliate, and affiliate_code from creators.json
@@ -53,5 +55,7 @@ export async function GET() {
     };
   });
   cache = { data: result, expires: Date.now() + CACHE_TTL * 1000 };
-  return NextResponse.json(result);
+  const response = NextResponse.json(result);
+  response.headers.set('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+  return response;
 } 
