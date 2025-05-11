@@ -101,8 +101,8 @@ export default function HomePage() {
             {/* Stream Video and Chat in a row */}
             <div className="flex flex-row w-full h-full">
               {/* Video: takes remaining space when chat is open, full width when chat is closed */}
-              <div className={`relative transition-all duration-300 ${chat_open ? 'flex-1 md:mr-0' : 'w-full' } flex items-center justify-center`}>
-                <div className="w-full h-full max-w-4xl aspect-[16/9] bg-black rounded-lg overflow-hidden">
+              <div className={`relative transition-all duration-300 ${chat_open ? 'flex-1 md:mr-0' : 'w-full'} flex items-center justify-center`}>
+                <div className="w-full h-full max-w-4xl aspect-[16/9] bg-black rounded-lg overflow-hidden md:max-w-4xl max-w-full" style={{ width: '100vw' }}>
                   <StreamEmbed
                     channel={main.login}
                     live={main.live}
@@ -118,7 +118,7 @@ export default function HomePage() {
                       Exit TV Mode
                     </button>
                     <button
-                      className="btn btn-sm btn-primary"
+                      className="btn btn-sm btn-primary hidden md:block"
                       onClick={() => set_chat_open((v) => !v)}
                     >
                       {chat_open ? 'Hide Chat' : 'Show Chat'}
@@ -126,8 +126,8 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              {/* Chat Panel: only visible if chat_open */}
-              <div className={`transition-all duration-300 ${chat_open ? 'w-[350px]' : 'w-0'} overflow-hidden`} style={{ minWidth: chat_open ? 350 : 0 }}>
+              {/* Chat Panel: only visible if chat_open and on md+ */}
+              <div className={`transition-all duration-300 hidden md:block ${chat_open ? 'w-[350px]' : 'w-0'} overflow-hidden`} style={{ minWidth: chat_open ? 350 : 0 }}>
                 <TwitchChatPanel
                   channel={main.login}
                   open={chat_open}
