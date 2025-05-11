@@ -1,8 +1,32 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function JoinPage() {
+  const [loading, set_loading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => set_loading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+  if (loading) {
+    return (
+      <main className="container mx-auto px-2 py-8 max-w-6xl">
+        <div className="flex justify-start mb-4">
+          <div className="btn btn-ghost btn-sm font-semibold w-32 h-8 shimmer bg-base-300 animate-pulse" />
+        </div>
+        <section className="bg-base-100 rounded-lg shadow-md p-4 sm:p-8 max-w-2xl mx-auto">
+          <div className="h-10 w-3/4 mx-auto mb-4 shimmer bg-base-300 animate-pulse rounded" />
+          <div className="h-6 w-full mb-4 shimmer bg-base-300 animate-pulse rounded" />
+          <div className="h-24 w-full mb-4 shimmer bg-base-300 animate-pulse rounded" />
+          <div className="h-6 w-full mb-4 shimmer bg-base-300 animate-pulse rounded" />
+          <div className="flex justify-center">
+            <div className="btn btn-primary text-base sm:text-lg px-4 sm:px-6 py-2 sm:py-3 rounded shadow font-bold w-full sm:w-auto shimmer bg-base-300 animate-pulse" style={{ minWidth: 200, height: 48 }} />
+          </div>
+        </section>
+      </main>
+    );
+  }
   return (
     <main className="container mx-auto px-2 py-8 max-w-6xl">
       <div className="flex justify-start mb-4">

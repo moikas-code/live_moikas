@@ -77,7 +77,23 @@ export default function ChangelogPage() {
       </nav>
       <section className="bg-base-200 rounded-lg p-6 shadow-lg">
         {loading ? (
-          <div className="skeleton h-32 w-full rounded-lg" aria-busy="true" />
+          <div className="space-y-6">
+            {[...Array(RESULTS_PER_PAGE)].map((_, i) => (
+              <div key={i} className="border-b border-base-300 pb-4">
+                <div className="h-6 w-2/3 mb-2 shimmer bg-base-300 animate-pulse rounded" />
+                <div className="h-4 w-1/3 mb-2 shimmer bg-base-300 animate-pulse rounded" />
+                <div className="flex items-center mt-1 gap-2">
+                  <div className="w-6 h-6 rounded-full shimmer bg-base-300 animate-pulse" />
+                  <div className="h-3 w-16 shimmer bg-base-300 animate-pulse rounded" />
+                </div>
+              </div>
+            ))}
+            <div className="flex justify-between items-center mt-8">
+              <div className="btn btn-outline btn-sm w-24 h-8 shimmer bg-base-300 animate-pulse" />
+              <div className="h-4 w-24 shimmer bg-base-300 animate-pulse rounded" />
+              <div className="btn btn-outline btn-sm w-24 h-8 shimmer bg-base-300 animate-pulse" />
+            </div>
+          </div>
         ) : error ? (
           <div className="alert alert-error">{error}</div>
         ) : (
