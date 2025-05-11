@@ -40,6 +40,7 @@ export default function HomePage() {
   const [show_offline, set_show_offline] = useState(false);
   const [tv_mode_open, set_tv_mode_open] = useState(false);
   const [chat_open, set_chat_open] = useState(false);
+  const [tv_mode_login, set_tv_mode_login] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -92,10 +93,41 @@ export default function HomePage() {
         c.user?.display_name?.toLowerCase().includes(search.toLowerCase()),
     );
 
+  // Set tv_mode_login to the current main stream when TV Mode is opened
+  useEffect(() => {
+    if (tv_mode_open && online_creators.length > 0) {
+      set_tv_mode_login((prev) => {
+        // If already set and still online, keep it
+        if (prev && online_creators.some((c) => c.login === prev)) return prev;
+        // Otherwise, use the main stream login
+        return mainLogin;
+      });
+    }
+    if (!tv_mode_open) {
+      set_tv_mode_login(null);
+    }
+  }, [tv_mode_open, mainLogin, online_creators]);
+
+  // Get the current TV Mode stream
+  const tv_mode_index = online_creators.findIndex((c) => c.login === tv_mode_login);
+  const tv_mode_stream = tv_mode_index >= 0 ? online_creators[tv_mode_index] : undefined;
+
+  // Handlers for arrow navigation
+  const handle_prev = () => {
+    if (online_creators.length < 2 || tv_mode_index === -1) return;
+    const prev_index = (tv_mode_index - 1 + online_creators.length) % online_creators.length;
+    set_tv_mode_login(online_creators[prev_index].login);
+  };
+  const handle_next = () => {
+    if (online_creators.length < 2 || tv_mode_index === -1) return;
+    const next_index = (tv_mode_index + 1) % online_creators.length;
+    set_tv_mode_login(online_creators[next_index].login);
+  };
+
   return (
     <>
       {/* TV Mode Overlay */}
-      {tv_mode_open && main && (
+      {tv_mode_open && tv_mode_stream && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
           <div className="relative flex flex-row w-full max-w-7xl h-[80vh]">
             {/* Stream Video and Chat in a row */}
@@ -104,32 +136,65 @@ export default function HomePage() {
               <div className={`relative transition-all duration-300 ${chat_open ? 'flex-1 md:mr-0' : 'w-full'} flex items-center justify-center`}>
                 <div className="w-full h-full max-w-4xl aspect-[16/9] bg-black rounded-lg overflow-hidden md:max-w-4xl max-w-full" style={{ width: '100vw' }}>
                   <StreamEmbed
-                    channel={main.login}
-                    live={main.live}
+                    channel={tv_mode_stream.login}
+                    live={tv_mode_stream.live}
                     parent={parent_domains}
                     should_autoplay={true}
                   />
-                  {/* TV Mode Controls: bottom left corner of the video */}
-                  <div className="absolute left-4 bottom-4 flex flex-col gap-2 z-10">
-                    <button
-                      className="btn btn-sm btn-error"
-                      onClick={() => set_tv_mode_open(false)}
-                    >
-                      Exit TV Mode
-                    </button>
-                    <button
-                      className="btn btn-sm btn-primary hidden md:block"
-                      onClick={() => set_chat_open((v) => !v)}
-                    >
-                      {chat_open ? 'Hide Chat' : 'Show Chat'}
-                    </button>
+                  {/* TV Mode Controls and Support Button: bottom row, left/right aligned */}
+                  <div className="absolute bottom-2 left-0 right-0 flex flex-row justify-between items-end z-10 px-4">
+                    {/* Left: nav, exit, chat */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-row gap-2 mb-2">
+                        <button
+                          className="btn btn-sm btn-circle btn-neutral"
+                          aria-label="Previous live user"
+                          onClick={handle_prev}
+                          disabled={online_creators.length < 2}
+                        >
+                          &#8592;
+                        </button>
+                        <button
+                          className="btn btn-sm btn-circle btn-neutral"
+                          aria-label="Next live user"
+                          onClick={handle_next}
+                          disabled={online_creators.length < 2}
+                        >
+                          &#8594;
+                        </button>
+                      </div>
+                      <button
+                        className="btn btn-sm btn-error"
+                        onClick={() => set_tv_mode_open(false)}
+                      >
+                        Exit TV Mode
+                      </button>
+                      <button
+                        className="btn btn-sm btn-primary hidden md:block"
+                        onClick={() => set_chat_open((v) => !v)}
+                      >
+                        {chat_open ? 'Hide Chat' : 'Show Chat'}
+                      </button>
+                    </div>
+                    {/* Right: Support Me button */}
+                    {tv_mode_stream.affiliate && tv_mode_stream.affiliate_code && tv_mode_stream.affiliate_code !== 'none' && (
+                      <a
+                        href={`https://moikas.com/${(tv_mode_stream.user?.display_name || tv_mode_stream.login) === 'MOIKAPY' ? 'discount/' : ''}${tv_mode_stream.affiliate_code}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-info btn-xs font-semibold mb-2"
+                        aria-label={`Support ${tv_mode_stream.user?.display_name || tv_mode_stream.login} with discount code`}
+                      >
+                        Support Me ({tv_mode_stream.affiliate_code.toUpperCase()})
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
               {/* Chat Panel: only visible if chat_open and on md+ */}
               <div className={`transition-all duration-300 hidden md:block ${chat_open ? 'w-[350px]' : 'w-0'} overflow-hidden`} style={{ minWidth: chat_open ? 350 : 0 }}>
                 <TwitchChatPanel
-                  channel={main.login}
+                  channel={tv_mode_stream.login}
                   open={chat_open}
                   onClose={() => set_chat_open(false)}
                 />
