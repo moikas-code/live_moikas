@@ -10,6 +10,14 @@ A high-quality web application built with Next.js (App Router), Tailwind CSS, Da
 - Performance optimizations (dynamic imports, SSR/SSG, caching)
 - ESLint and Prettier for code quality
 
+## Project Structure
+- `src/app/` – App Router pages, API routes, and subpages (`changelog`, `join`, etc.)
+- `src/components/` – Reusable UI components
+- `src/lib/` – Utility functions (e.g., Twitch API helpers)
+- `src/data/` – Static creator list
+- `types/` – TypeScript type definitions
+- `public/` – Static assets (e.g., icons)
+
 ## Setup Instructions
 
 ### 1. Clone the repository
@@ -24,16 +32,11 @@ bun install
 ```
 
 ### 3. Configure environment variables
-Copy `.env.local.example` to `.env.local` and fill in your Twitch API credentials:
-```sh
-cp .env.local.example .env.local
-```
-Edit `.env.local`:
+Create a `.env.local` file in the project root with the following content:
 ```
 TWITCH_CLIENT_ID=your_twitch_client_id
 TWITCH_CLIENT_SECRET=your_twitch_client_secret
 ```
-
 - Get your credentials from the [Twitch Developer Console](https://dev.twitch.tv/console/apps).
 
 ### 4. Run the development server
@@ -43,15 +46,13 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-## Project Structure
-- `src/app/` - App Router pages and API routes
-- `src/components/` - Reusable UI components
-- `src/lib/` - Utility functions (e.g., Twitch API helpers)
-- `src/data/` - Static creator list
+## Scripts
+- `bun dev` – Start the development server
+- `bun run lint` – Run ESLint
+- `bunx prettier --write .` – Format code with Prettier (run manually)
 
-## Linting & Formatting
-- Run ESLint: `bun run lint`
-- Run Prettier: `bun run format`
+## Coding Conventions
+- All identifiers use `snake_case` for consistency and readability.
 
 ## Notes
 - The app uses the Twitch Embed JavaScript SDK for dynamic, responsive stream embeds.

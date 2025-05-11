@@ -4,6 +4,7 @@ import CreatorCard from '@/components/CreatorCard';
 import StreamEmbed from '@/components/StreamEmbed';
 import Image from 'next/image';
 import TwitchChatPanel from '@/components/TwitchChatPanel';
+import Link from 'next/link';
 
 export interface StreamData {
   title: string;
@@ -201,7 +202,20 @@ export default function HomePage() {
       )}
       <main className="container mx-auto px-2 py-8 max-w-6xl">
         <nav className="navbar bg-base-100 rounded-lg mb-8 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
-          <div className="text-3xl font-extrabold mb-2 md:mb-0">live.moikas</div>
+          <div
+            className="text-3xl font-extrabold mb-2 md:mb-0 tracking-wide select-none"
+            style={{
+              fontFamily: `'M PLUS Rounded 1c', 'Montserrat', 'ui-rounded', 'ui-sans-serif', 'system-ui', sans-serif`,
+              background: 'linear-gradient(90deg, #f43f5e 0%, #6366f1 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 2px 8px rgba(99,102,241,0.12), 0 1px 0 #fff',
+              letterSpacing: '0.04em',
+            }}
+            aria-label="Live Moikas Home"
+          >
+            live.moikas
+          </div>
           <div className="flex flex-col md:flex-row w-full md:w-auto gap-2 md:gap-2 items-stretch md:items-center">
             <input
               type="text"
@@ -429,8 +443,17 @@ export default function HomePage() {
         <span className="text-base-content/60 text-sm mb-2">
           &copy; {new Date().getFullYear()} live.moikas
         </span>
+        <span className="text-base-content/60 text-xs mb-4">
+          Licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer" className="underline">MIT License</a>
+        </span>
         {/* Mobile action buttons: flex on mobile, hidden on md+ */}
         <div className="flex flex-col gap-2 w-full px-4 md:hidden">
+          <Link href="/" className="btn btn-primary btn-xs font-semibold w-full">
+            Home
+          </Link>
+          <a href="/about" className="btn btn-secondary btn-xs font-semibold w-full">
+            About
+          </a>
           <a href="/join" className="btn btn-accent btn-xs font-semibold w-full">
             Join
           </a>
@@ -472,6 +495,12 @@ export default function HomePage() {
         </div>
         {/* Desktop footer buttons remain as before */}
         <div className="hidden md:flex gap-2">
+          <Link href="/" className="btn btn-primary btn-xs font-semibold">
+            Home
+          </Link>
+          <a href="/about" className="btn btn-secondary btn-xs font-semibold">
+            About
+          </a>
           <a href="/join" className="btn btn-accent btn-xs font-semibold">
             Join
           </a>
