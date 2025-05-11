@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import CreatorCard from '@/components/CreatorCard';
 import StreamEmbed from '@/components/StreamEmbed';
 import Image from 'next/image';
+import TwitchChatPanel from '@/components/TwitchChatPanel';
 
 export interface StreamData {
   title: string;
@@ -37,6 +38,8 @@ export default function HomePage() {
   const [parent_domains, set_parent_domains] = useState<string[]>(['localhost']);
   const filtered_offline = creators.filter((c) => !c.live);
   const [show_offline, set_show_offline] = useState(false);
+  const [tv_mode_open, set_tv_mode_open] = useState(false);
+  const [chat_open, set_chat_open] = useState(false);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -91,6 +94,50 @@ export default function HomePage() {
 
   return (
     <>
+      {/* TV Mode Overlay */}
+      {tv_mode_open && main && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
+          <div className="relative flex flex-row w-full max-w-7xl h-[80vh]">
+            {/* Stream Video and Chat in a row */}
+            <div className="flex flex-row w-full h-full">
+              {/* Video: takes remaining space when chat is open, full width when chat is closed */}
+              <div className={`relative transition-all duration-300 ${chat_open ? 'flex-1 md:mr-0' : 'w-full' } flex items-center justify-center`}>
+                <div className="w-full h-full max-w-4xl aspect-[16/9] bg-black rounded-lg overflow-hidden">
+                  <StreamEmbed
+                    channel={main.login}
+                    live={main.live}
+                    parent={parent_domains}
+                    should_autoplay={true}
+                  />
+                  {/* TV Mode Controls: bottom left corner of the video */}
+                  <div className="absolute left-4 bottom-4 flex flex-col gap-2 z-10">
+                    <button
+                      className="btn btn-sm btn-error"
+                      onClick={() => set_tv_mode_open(false)}
+                    >
+                      Exit TV Mode
+                    </button>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => set_chat_open((v) => !v)}
+                    >
+                      {chat_open ? 'Hide Chat' : 'Show Chat'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Chat Panel: only visible if chat_open */}
+              <div className={`transition-all duration-300 ${chat_open ? 'w-[350px]' : 'w-0'} overflow-hidden`} style={{ minWidth: chat_open ? 350 : 0 }}>
+                <TwitchChatPanel
+                  channel={main.login}
+                  open={chat_open}
+                  onClose={() => set_chat_open(false)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <main className="container mx-auto px-2 py-8 max-w-6xl">
         <nav className="navbar bg-base-100 rounded-lg mb-8 flex flex-col md:flex-row gap-2 md:gap-0 justify-between items-center">
           <div className="text-3xl font-extrabold mb-2 md:mb-0">live.moikas</div>
@@ -145,89 +192,101 @@ export default function HomePage() {
             <div className="skeleton h-96 w-full rounded-lg" aria-busy="true" />
           ) : error ? (
             <div className="alert alert-error">{error}</div>
-          ) : main ? (
-            <div className="w-full max-w-4xl mx-auto rounded-4xl p-6 shadow-2xl">
-              <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-black mb-4">
-                <StreamEmbed
-                  channel={main.login}
-                  live={main.live}
-                  parent={parent_domains}
-                  should_autoplay={true}
-                />
-              </div>
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div className="flex items-center gap-4">
-                  {main.user?.profile_image_url && (
-                    <Image
-                      src={main.user.profile_image_url}
-                      alt={main.user.display_name || main.login}
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover hidden md:block"
+          ) : main && !tv_mode_open ? (
+            <div className="relative w-full max-w-4xl mx-auto rounded-4xl p-6 shadow-2xl">
+              <div className="flex flex-row">
+                <div className="flex-1 transition-all duration-300">
+                  <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-black mb-4">
+                    <StreamEmbed
+                      channel={main.login}
+                      live={main.live}
+                      parent={parent_domains}
+                      should_autoplay={true}
                     />
-                  )}
-                  <div className="flex flex-col gap-1 max-w-[600px]">
-                    <div className="text-sm md:text-2xl font-bold">
-                      {main.user?.display_name || main.login}
-                    </div>
-                    {main.live && main.stream?.title && (
-                      <div
-                        className="text-xs font-semibold mt-1 mb-1 text-ellipsis overflow-hidden"
-                        title={main.stream.title}
-                      >
-                        {main.stream.title.length > 100
-                          ? main.stream.title.slice(0, 100) + '...'
-                          : main.stream.title}
-                      </div>
-                    )}
-                    {main.user?.description && (
-                      <div className="text-xs text-base-content/60 mt-1">
-                        {main.user.description}
-                      </div>
-                    )}
                   </div>
-                </div>
-                <div className="flex flex-col items-start md:items-end gap-1">
-                  {main.live && main.stream ? (
-                    <>
-                      {main.stream.game_name && (
+                  {/* Stream info and controls below video */}
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex items-center gap-4">
+                      {main.user?.profile_image_url && (
+                        <Image
+                          src={main.user.profile_image_url}
+                          alt={main.user.display_name || main.login}
+                          width={64}
+                          height={64}
+                          className="w-16 h-16 rounded-full border-2 border-base-300 shadow object-cover hidden md:block"
+                        />
+                      )}
+                      <div className="flex flex-col gap-1 max-w-[600px]">
+                        <div className="text-sm md:text-2xl font-bold">
+                          {main.user?.display_name || main.login}
+                        </div>
+                        {main.live && main.stream?.title && (
+                          <div
+                            className="text-xs font-semibold mt-1 mb-1 text-ellipsis overflow-hidden"
+                            title={main.stream.title}
+                          >
+                            {main.stream.title.length > 100
+                              ? main.stream.title.slice(0, 100) + '...'
+                              : main.stream.title}
+                          </div>
+                        )}
+                        {main.user?.description && (
+                          <div className="text-xs text-base-content/60 mt-1">
+                            {main.user.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start md:items-end gap-1">
+                      {main.live && main.stream ? (
+                        <>
+                          {main.stream.game_name && (
+                            <span
+                              className="text-xs text-purple-800 bg-purple-100 rounded px-2 py-1 w-fit mb-1"
+                              style={{ letterSpacing: '0.5px' }}
+                            >
+                              {main.stream.game_name}
+                            </span>
+                          )}
+                          <span className="text-xs">Viewers: {main.stream.viewer_count}</span>
+                          <a
+                            href={`https://twitch.tv/${main.login}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary btn-xs font-semibold mt-2"
+                            aria-label={`Visit ${main.login}'s Twitch channel`}
+                          >
+                            Visit Stream
+                          </a>
+                          {main.affiliate && main.affiliate_code && main.affiliate_code !== 'none' && (
+                            <a
+                              href={`https://moikas.com/${(main.user?.display_name || main.login) === 'MOIKAPY' ? 'discount/' : ''}${main.affiliate_code}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-info btn-xs font-semibold mt-2"
+                              aria-label={`Get merch discount for ${main.user?.display_name || main.login}`}
+                            >
+                              Get Merch Discount ({main.affiliate_code.toUpperCase()})
+                            </a>
+                          )}
+                          {/* TV Mode button */}
+                          <button
+                            className="btn btn-sm btn-primary mt-2"
+                            onClick={() => set_tv_mode_open(true)}
+                          >
+                            TV Mode
+                          </button>
+                        </>
+                      ) : (
                         <span
-                          className="text-xs text-purple-800 bg-purple-100 rounded px-2 py-1 w-fit mb-1"
+                          className="text-sm font-bold text-red-800 bg-red-100 rounded px-2 py-1 w-fit"
                           style={{ letterSpacing: '0.5px' }}
                         >
-                          {main.stream.game_name}
+                          Offline
                         </span>
                       )}
-                      <span className="text-xs">Viewers: {main.stream.viewer_count}</span>
-                      <a
-                        href={`https://twitch.tv/${main.login}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-primary btn-xs font-semibold mt-2"
-                        aria-label={`Visit ${main.login}'s Twitch channel`}
-                      >
-                        Visit Stream
-                      </a>
-                      {main.affiliate && main.affiliate_code && main.affiliate_code !== 'none' && (
-                        <a
-                          href={`https://moikas.com/${(main.user?.display_name || main.login) === 'MOIKAPY' ? 'discount/' : ''}${main.affiliate_code}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-info btn-xs font-semibold mt-2"
-                          aria-label={`Get merch discount for ${main.user?.display_name || main.login}`}
-                        >
-                          Get Merch Discount ({main.affiliate_code.toUpperCase()})
-                        </a>
-                      )}
-                    </>
-                  ) : (
-                    <span
-                      className="text-sm font-bold text-red-800 bg-red-100 rounded px-2 py-1 w-fit"
-                      style={{ letterSpacing: '0.5px' }}
-                    >
-                      Offline
-                    </span>
-                  )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
