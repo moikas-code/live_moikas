@@ -5,6 +5,11 @@ import StreamEmbed from '@/components/StreamEmbed';
 import Image from 'next/image';
 import TwitchChatPanel from '@/components/TwitchChatPanel';
 import Link from 'next/link';
+import {
+  get_user_added_streamers,
+  add_user_streamer,
+  remove_user_streamer,
+} from '@/lib/local_storage';
 
 export interface StreamData {
   title: string;
@@ -29,6 +34,7 @@ interface CreatorStatus {
   user: UserData | null;
   affiliate: boolean;
   affiliate_code?: string;
+  user_added?: boolean;
 }
 
 export default function HomePage() {
@@ -43,15 +49,50 @@ export default function HomePage() {
   const [chat_open, set_chat_open] = useState(false);
   const [tv_mode_login, set_tv_mode_login] = useState<string | null>(null);
   const [selected_main_login, set_selected_main_login] = useState<string | null>(null);
+  const [user_streamers, set_user_streamers] = useState<string[]>([]);
+  const [add_streamer_input, set_add_streamer_input] = useState('');
+  const [add_streamer_error, set_add_streamer_error] = useState<string | null>(null);
+  const [user_streamers_collapsed, set_user_streamers_collapsed] = useState(true);
 
+  // Load user-added streamers from localStorage
+  useEffect(() => {
+    set_user_streamers(get_user_added_streamers());
+  }, []);
+
+  // Merge user-added streamers with creators
   useEffect(() => {
     async function fetchStatus() {
       setLoading(true);
       setError(null);
       try {
+        // Merge user streamers with default creators
         const res = await fetch('/api/twitch-status');
         if (!res.ok) throw new Error('Failed to fetch Twitch status');
-        const data = await res.json();
+        let data = await res.json();
+        // Add user streamers if not already present
+        const user_only = user_streamers.filter(
+          (u) => !data.some((c: CreatorStatus) => c.login.toLowerCase() === u.toLowerCase())
+        );
+        if (user_only.length > 0) {
+          // Fetch Twitch info for user-only streamers
+          const user_res = await fetch(`/api/twitch-status?users=${user_only.join(',')}`);
+          if (user_res.ok) {
+            const user_data: CreatorStatus[] = await user_res.json();
+            // Mark as not affiliate and with a badge
+            user_data.forEach((c) => {
+              c.affiliate = false;
+              c.affiliate_code = undefined;
+              c.user_added = true;
+            });
+            data = data.concat(user_data);
+          }
+        }
+        // Mark user-added streamers
+        (data as CreatorStatus[]).forEach((c) => {
+          if (user_streamers.some((u) => u.toLowerCase() === c.login.toLowerCase())) {
+            c.user_added = true;
+          }
+        });
         setCreators(data);
       } catch (e: unknown) {
         if (e instanceof Error) {
@@ -64,7 +105,8 @@ export default function HomePage() {
       }
     }
     fetchStatus();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user_streamers]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -119,6 +161,33 @@ export default function HomePage() {
     if (online_creators.length < 2 || tv_mode_index === -1) return;
     const next_index = (tv_mode_index + 1) % online_creators.length;
     set_tv_mode_login(online_creators[next_index].login);
+  };
+
+  // Add streamer handler
+  const handle_add_streamer = () => {
+    const username = add_streamer_input.trim().toLowerCase();
+    if (!username) {
+      set_add_streamer_error('Please enter a Twitch username.');
+      return;
+    }
+    if (user_streamers.includes(username)) {
+      set_add_streamer_error('This user is already added.');
+      return;
+    }
+    // Prevent adding streamers already in the main creators list
+    if (creators.some((c) => c.login.toLowerCase() === username && !c.user_added)) {
+      set_add_streamer_error('This streamer is already on the page.');
+      return;
+    }
+    add_user_streamer(username);
+    set_user_streamers(get_user_added_streamers());
+    set_add_streamer_input('');
+    set_add_streamer_error(null);
+  };
+  // Remove streamer handler
+  const handle_remove_streamer = (username: string) => {
+    remove_user_streamer(username);
+    set_user_streamers(get_user_added_streamers());
   };
 
   return (
@@ -208,7 +277,7 @@ export default function HomePage() {
               fontFamily: `'M PLUS Rounded 1c', 'Montserrat', 'ui-rounded', 'ui-sans-serif', 'system-ui', sans-serif`,
               background: 'linear-gradient(90deg, #f43f5e 0%, #6366f1 100%)',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              WebkitTextFillColor: '#000',
               textShadow: '0 2px 8px rgba(99,102,241,0.12), 0 1px 0 #fff',
               letterSpacing: '0.04em',
             }}
@@ -372,6 +441,64 @@ export default function HomePage() {
           <span className="mx-4 text-lg font-bold text-base-content/60">Other Creators</span>
           <hr className="flex-grow border-t-2 border-base-300" />
         </div>
+        {/* Add streamer UI */}
+        <section className="mb-8 bg-base-100 rounded-lg p-4 flex flex-col md:flex-row items-center gap-4">
+          <input
+            type="text"
+            className="input input-bordered w-full md:w-64"
+            placeholder="Add Twitch username..."
+            value={add_streamer_input}
+            onChange={(e) => {
+              set_add_streamer_input(e.target.value);
+              set_add_streamer_error(null);
+            }}
+            aria-label="Add Twitch username"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handle_add_streamer();
+            }}
+          />
+          <button className="btn btn-primary" onClick={handle_add_streamer}>
+            Add Streamer
+          </button>
+          {add_streamer_error && <span className="text-error text-sm">{add_streamer_error}</span>}
+        </section>
+        {/* User-added streamers section */}
+        {creators.some((c) => c.user_added) && (
+          <section className="mb-8 bg-base-200 rounded-lg p-6">
+            <button
+              className="btn btn-sm btn-ghost mb-4"
+              onClick={() => set_user_streamers_collapsed((v) => !v)}
+              aria-expanded={!user_streamers_collapsed}
+              aria-controls="user-added-streamers-section"
+            >
+              {user_streamers_collapsed
+                ? `Show My Added Streamers (${creators.filter((c) => c.user_added).length})`
+                : 'Hide My Added Streamers'}
+            </button>
+            <div
+              id="user-added-streamers-section"
+              className={user_streamers_collapsed ? 'hidden' : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8'}
+            >
+              {creators.filter((c) => c.user_added).map((c) => (
+                <div key={c.login} className="relative">
+                  <CreatorCard
+                    {...c}
+                    affiliate={c.affiliate}
+                    affiliate_code={c.affiliate_code}
+                  />
+                  <button
+                    className="absolute top-2 right-2 btn btn-xs btn-error"
+                    onClick={() => handle_remove_streamer(c.login)}
+                    aria-label={`Remove ${c.login}`}
+                  >
+                    Remove
+                  </button>
+                  <span className="absolute top-2 left-2 badge badge-info">User Added</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="bg-base-200 rounded-lg p-6">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
