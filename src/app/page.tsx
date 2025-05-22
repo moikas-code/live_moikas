@@ -594,6 +594,17 @@ export default function HomePage() {
             Support Us
           </a>
           <a
+            href="https://x.com/moikas_official"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline btn-xs font-semibold w-full"
+            aria-label="Contact Me on X"
+          >
+            {/* X (Twitter) SVG icon */}
+            <svg height="16" width="16" viewBox="0 0 1200 1227" fill="currentColor" aria-hidden="true" className="inline-block align-text-bottom mr-1"><path d="M1200 24.6L741.1 623.2 1192.2 1202.4H1017.6L661.2 749.2 259.2 1202.4H0L484.2 642.7 55.2 24.6H238.8L561.6 445.2 936 24.6H1200ZM960.6 1122.6H1066.8L340.2 104.2H228.6L960.6 1122.6Z"/></svg>
+            Contact Me
+          </a>
+          <a
             href="/changelog"
             className="btn btn-info btn-xs font-semibold w-full"
             aria-label="View Changelog"
@@ -639,6 +650,16 @@ export default function HomePage() {
             aria-label="Support Us by buying merch"
           >
             Support Us
+          </a>
+          <a
+            href="https://x.com/moikas_official"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline btn-xs font-semibold"
+            aria-label="Contact Me on X"
+          >
+            <svg height="16" width="16" viewBox="0 0 1200 1227" fill="currentColor" aria-hidden="true" className="inline-block align-text-bottom mr-1"><path d="M1200 24.6L741.1 623.2 1192.2 1202.4H1017.6L661.2 749.2 259.2 1202.4H0L484.2 642.7 55.2 24.6H238.8L561.6 445.2 936 24.6H1200ZM960.6 1122.6H1066.8L340.2 104.2H228.6L960.6 1122.6Z"/></svg>
+            Contact Me
           </a>
           <a
             href="/changelog"
